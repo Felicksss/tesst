@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат GPT</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-window {
+            flex: 1;
+            background: #e8f5e9;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border: 2px solid #4caf50; 
+            border-radius: 10px;
+        }
+        
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-around; 
+            padding: 10px;
+        }
+        
+        button {
+            padding: 10px 15px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .user-message {
+            color: blue; 
+        }
+        
+        .gpt-message {
+            color: green; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-window">
+    <h1>Чат GPT</h1>
+    <div id="chat-box"></div>
+    <div>
+        <input type="text" id="message" placeholder="Введите сообщение...">
+        <button id="sendBtn">Отправить</button>
+    </div>
+</div>
+
+<div class="buttons">
+    <button id="button1">Кнопка 1</button>
+    <button id="button2">Кнопка 2</button>
+</div>
+
+<script>
+    document.getElementById('button1').onclick = function() {
+        alert('Кнопка 1 Без функции :)');
+    };
+
+    document.getElementById('button2').onclick = function() {
+        alert('Кнопка 2 Без функции :)');
+    };
+
+    document.getElementById('sendBtn').onclick = async function() {
+        const messageInput = document.getElementById('message');
+        const message = messageInput.value;
+        if (message) {
+            sendMessage('Вы: *' + message + '*', 'user');
+            messageInput.value = ''; 
+            const gptResponse = await getResponseFromGPT(message);
+            sendMessage('GPT: *' + gptResponse + '*', 'gpt');
+        }
+    };
+
+    function sendMessage(message, sender) {
+        const chatBox = document.getElementById('chat-box');
+        const messageClass = (sender === 'user') ? 'user-message' : 'gpt-message';
+        chatBox.innerHTML += '<div class="' + messageClass + '">' + message + '</div>';
+        chatBox.scrollTop = chatBox.scrollHeigh
+    }
+    // Тут сам GPT Чат
+    async function getResponseFromGPT(userMessage) {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer YOUR_API_KEY' // вместо YOUR_API_KEY Вставь свой API ключ
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [{role: 'user', content: userMessage}]
+            })
+        });
+        const data = await response.json();
+        return data.choices[0].message.content; 
+    }
+</script>
+
+</body>
+</html>
